@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+    {% if articles %}
+        <div class="articles">
+        {% for article in articles %}
+            <div class="article">
+                <a href="/article/{{ article.id }}/" style="text-decoration: none">
+                    <img class="thumbnail" src="media/{{ article.id }}/thumbnail.png" alt="{{ article.title }}">
+                </a>
+                <ul>
+                    <li class="date">{{ article.date }}</li>
+                    <li class="title">
+                        <a href="/article/{{ article.id }}/">
+                            {{ article.title }}
+                        </a>
+                    </li>
+                    <li class="description">{{ article.description }}</li>
+                </ul>
+            </div>
+        {% endfor %}
+        </div>
+    {% else %}
+        <h1 class="content article">No articles found.</h1>
+    {% endif %}
+{% endblock %}

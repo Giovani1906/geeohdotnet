@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+    {% if user.is_authenticated %}
+        <div class="content" style="text-align: center">
+            <h3>Welcome, {{ user.username }}.</h3>
+            <div style="margin-top: 21px">
+                <form method="post">
+                    <input id="publish-button" type="submit" value="Sign out" style="font-size: 24px; width: 177px; height: 42px">
+                </form>
+            </div>
+        </div>
+    {% else %}
+        <div class="content" style="text-align: center">
+            <h1>Authenticate</h1>
+            <form method="post" enctype="application/x-www-form-urlencoded">
+                <h3><label for="username">Username</label></h3>
+                <input type="text" name="username" id="username" required>
+                <h3><label for="password">Password</label></h3>
+                <input type="password" name="password" id="password" required>
+                <div style="margin-top: 21px">
+                    <input id="publish-button" type="submit" value="Sign in" style="font-size: 24px; width: 177px; height: 42px">
+                </div>
+            </form>
+        </div>
+    {% endif %}
+{% endblock %}

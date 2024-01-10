@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="content">
+        <div id="preview">Preview goes here.</div>
+        <form method="post" enctype="multipart/form-data">
+            <label for="content" style="display: block; padding: 21px 0 21px 0">Write your thoughts, {{ user.username }}.</label>
+            <textarea name="content" id="content" rows="25"></textarea>
+            <label for="title">Post Title</label>
+            <input type="text" name="title" id="title" required style="width: 100%; margin-bottom: 21px">
+            <label for="description">Post Description</label>
+            <input type="text" name="description" id="description" required style="width: 100%; margin-bottom: 21px">
+            <div style="margin-bottom: 21px">
+                <div style="display: inline-block">
+                    <label for="thumbnail">Thumbnail (Rec. Resolution: 240x135)</label>
+                    <input type="file" name="thumbnail" id="thumbnail" required>
+                </div>
+                <div style="float: right">
+                    <label for="banner">Banner (Rec. Resolution: 1920x200)</label>
+                    <input type="file" name="banner" id="banner" required>
+                </div>
+            </div>
+            <label for="article-files">Article Files</label>
+            <input type="file" name="article-files" id="article-files" multiple style="margin-bottom: 21px">
+            <div>
+                <button id="publish-button" hx-post="/markdownify" hx-swap="innerHTML" hx-target="#preview">Preview</button>
+                <input id="publish-button" type="submit" value="Publish" onclick="return confirm('Are you sure?');" style="float: right">
+            </div>
+        </form>
+    </div>
+{% endblock %}
