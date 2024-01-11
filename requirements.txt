@@ -1,2 +1,4 @@
 Django==5.0.1
+django-axes[ipware]==6.3.0
+pymemcache==4.0.0
 markdown2==2.4.12

@@ -1,7 +1,9 @@
 import os
 import json
+import hashlib
 import datetime
 
+from django.conf import settings
 from django.shortcuts import render, redirect
 from django.http import Http404, HttpRequest, HttpResponse, QueryDict
 from django.contrib.auth import authenticate, login, logout
@@ -26,10 +28,16 @@ def get_articles() -> list:
         data = open('articles/index.json', 'rb').read()
         return json.loads(data)['articles']
     except FileNotFoundError:
-        data = json.dumps('{"articles":[]}').encode('utf-8')
-        os.mkdir('articles')
+        data = json.dumps({'articles': []}).encode('utf-8')
+        if not os.path.exists("articles"):
+            os.mkdir('articles')
         open('articles/index.json', 'wb').write(data)
         return []
+
+
+def _hash(text: str) -> str:
+    hashed_data = hashlib.sha3_512(text.encode('utf8') + settings.SECRET_KEY.encode('utf8'))
+    return hashed_data.hexdigest()
 
 
 def index(request: HttpRequest):
@@ -61,7 +69,12 @@ def auth(request: HttpRequest):
         if request.user.is_authenticated:
             logout(request)
             return redirect('/auth')
-        user = authenticate(username=request.POST['username'], password=request.POST['password'])
+        kwargs = {
+            'request': request,
+            'username': request.POST['username'],
+            'password': _hash(request.POST['password'])
+        }
+        user = authenticate(**kwargs)
         if user is not None:
             login(request, user)
             url = request.GET.get('next')

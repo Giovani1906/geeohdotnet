@@ -5,7 +5,7 @@ from geeohdotnet.models import User
 from django.contrib.auth.backends import BaseBackend
 
 
-with open('credentials.json', 'r') as f:
+with open('credentials.json', 'rb') as f:
     credentials = json.loads(f.read())
 
 

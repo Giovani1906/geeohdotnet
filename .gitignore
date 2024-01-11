@@ -5,3 +5,4 @@ venv/
 articles/
 media/
 credentials.json
+settings.json
