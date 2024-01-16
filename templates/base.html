@@ -3,16 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="theme-color" content="#1b1b1b" />
-    <title>geeoh.net</title>
+    {% if page == "article" %}
+        <title>{{ article.title }} | geeoh.net</title>
+    {% elif page %}
+        <title>{{ page|title }} | geeoh.net</title>
+    {% else %}
+        <title>geeoh.net</title>
+    {% endif %}
     <link rel="shortcut icon" href="/static/favicon.png">
-    <link rel="stylesheet" type='text/css' href="/static/style.css{{ css_age }}">
+    <link rel="stylesheet" type="text/css" href="/static/style.css{{ css_age }}">
     <script src="/static/js/htmx.min.js"></script>
 </head>
 <body>
     <div class="header">
         <div class="title"><a href="/" style="color: #ffffff; text-decoration: none;">geeoh.net</a></div>
-        <div class="motto">I just don’t know what went wrong!</div>
+        {% if motto %}
+            <div class="motto">{{ motto }}</div>
+        {% else %}
+            <div class="motto">I just don’t know what went wrong!</div>
+        {% endif %}
+        {% if user.is_authenticated and page != "publish" %}
+            <div class="publish"><a href="/publish/" style="color: #ffffff;">Publish</a></div>
+        {% endif %}
     </div>
     {% block content %}{% endblock %}
+    <footer>
+        <div class="title"><a href="/" style="color: #333333; text-decoration: none;">geeoh.net</a></div>
+        <div style="color: #333333">Copyright &copy; {% now 'Y' %} &bullet; geeoh.net</div>
+    </footer>
 </body>
 </html>

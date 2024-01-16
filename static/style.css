@@ -139,6 +139,14 @@ blockquote {
     font-size: 24px;
     padding-left: 10px;
 }
+.header .publish {
+    display: inline-block;
+    font-family: 'Gotham Black', sans-serif;
+    font-size: 24px;
+    position: sticky;
+    left: 100%;
+    padding-right: 24px;
+}
 .content {
     font-family: 'Gotham Office', sans-serif;
     width: 90%;
@@ -196,6 +204,19 @@ blockquote {
     font-family: 'Gotham Medium', sans-serif;
     font-size: 30px;
 }
+footer {
+    font-family: 'Gotham Office', sans-serif;
+    width: 90%;
+    margin-top: 36px;
+    margin-left: auto;
+    margin-right: auto;
+    border-top: 2px solid #333333;
+}
+footer .title {
+    font-family: 'Gotham Ultra', sans-serif;
+    font-size: 36px;
+    text-transform: uppercase;
+}
 #preview {
     padding: 36px 0 36px 0;
     border-bottom: 2px solid #333333;
@@ -233,6 +254,10 @@ blockquote {
         font-size: 12px;
         padding-left: 5px;
     }
+    .header .publish {
+        font-size: 12px;
+        padding-right: 12px;
+    }
     .articles {
         width: 95%;
     }
@@ -255,5 +280,11 @@ blockquote {
     }
     .article .description {
         font-size: 20px;
+    }
+    footer {
+        width: 95%;
+    }
+    footer .title {
+        font-size: 18px;
     }
 }
