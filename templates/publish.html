@@ -22,7 +22,7 @@
             <label for="article-files">Article Files</label>
             <input type="file" name="article-files" id="article-files" multiple style="margin-bottom: 21px">
             <div>
-                <button id="publish-button" hx-post="/markdownify" hx-swap="innerHTML" hx-target="#preview">Preview</button>
+                <button id="publish-button" hx-post="/markdownify/" hx-swap="innerHTML" hx-target="#preview">Preview</button>
                 <input id="publish-button" type="submit" value="Publish" onclick="return confirm('Are you sure?');" style="float: right">
             </div>
         </form>

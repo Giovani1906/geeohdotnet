@@ -28,10 +28,14 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'axes.middleware.AxesMiddleware',
 ]
+
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 

@@ -3,6 +3,7 @@ import json
 import hashlib
 import datetime
 
+from django.utils.text import slugify
 from django.conf import settings
 from django.shortcuts import render, redirect
 from django.http import Http404, HttpRequest, HttpResponse, QueryDict
@@ -48,10 +49,14 @@ def index(request: HttpRequest):
     return render(request, 'index.html', context)
 
 
-def article(request: HttpRequest, article_id: int):
+def article(request: HttpRequest, article_id: int = None, article_title: str = None):
     article_data = find(lambda a: a['id'] == article_id, get_articles())
+
     if not article_data:
         raise Http404
+    if article_title and article_title != slugify(article_data['title']):
+        return redirect(f'/article/{article_id}/')
+
     article_raw = open(f'articles/{article_id}.md', 'r', encoding='utf-8').read()
     article_md = markdown(article_raw, extras=md_extra)
     context = {
@@ -61,6 +66,13 @@ def article(request: HttpRequest, article_id: int):
     return render(request, 'article.html', context)
 
 
+def article_redirect(request: HttpRequest, article_title: str):
+    article_data = find(lambda a: slugify(a['title']) == article_title, get_articles())
+    if not article_data:
+        raise Http404
+    return redirect(f'/article/{article_data["id"]}/{article_title}/')
+
+
 def auth(request: HttpRequest):
     context = {'css_age': f'?v={int(os.path.getmtime("static/style.css"))}'}
     if request.method == 'GET':
@@ -68,7 +80,7 @@ def auth(request: HttpRequest):
     elif request.method == 'POST':
         if request.user.is_authenticated:
             logout(request)
-            return redirect('/auth')
+            return redirect('/auth/')
         kwargs = {
             'request': request,
             'username': request.POST['username'],
@@ -80,7 +92,7 @@ def auth(request: HttpRequest):
             url = request.GET.get('next')
             if url:
                 return redirect(url)
-            return redirect('/auth')
+            return redirect('/auth/')
         else:
             context['message'] = 'Bad username and/or password.'
             return render(request, 'message.html', context, status=401)
