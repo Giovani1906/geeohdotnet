@@ -4,10 +4,20 @@
     <meta charset="UTF-8">
     <meta name="theme-color" content="#1b1b1b" />
     {% if page == "article" %}
+        <meta property="og:site_name" content="geeoh.net">
+        <meta property="og:title" content="{{ article.title }}">
+        <meta property="og:description" content="{{ article.description }}">
+        <meta property="og:type" content="article">
+        <meta property="og:url" content="https://geeoh.net/article/{{ article.id }}/{{ article.title|slugify }}/">
+        <meta property="og:image" content="https://geeoh.net/media/{{ article.id }}/thumbnail.png">
         <title>{{ article.title }} | geeoh.net</title>
     {% elif page %}
         <title>{{ page|title }} | geeoh.net</title>
     {% else %}
+        <meta property="og:site_name" content="geeoh.net">
+        <meta property="og:type" content="website">
+        <meta property="og:description" content="Yelling at the void.">
+        <meta property="og:image" content="https://geeoh.net/static/favicon.png">
         <title>geeoh.net</title>
     {% endif %}
     <link rel="shortcut icon" href="/static/favicon.png">

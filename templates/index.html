@@ -5,7 +5,7 @@
         {% for article in articles %}
             <div class="article">
                 <a href="/article/{{ article.id }}/{{ article.title|slugify }}/" style="text-decoration: none">
-                    <img class="thumbnail" src="media/{{ article.id }}/thumbnail.png" alt="{{ article.title }}">
+                    <img class="thumbnail" src="/media/{{ article.id }}/thumbnail.png" alt="{{ article.title }}">
                 </a>
                 <ul>
                     <li class="date">{{ article.date }}</li>
