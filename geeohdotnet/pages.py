@@ -119,17 +119,17 @@ def publish(request: HttpRequest):
         date = datetime.datetime.utcnow()
         articles = get_articles()
         iteration = 1
-        article_id = int(f'{date.year}{date.month}{date.day}{iteration:02d}'[2:])
+        article_id = int(f'{date.year}{date.month:02d}{date.day:02d}{iteration:02d}'[2:])
         while True:
             if find(lambda a: a['id'] == article_id, articles):
                 iteration += 1
-                article_id = int(f'{date.year}{date.month}{date.day}{iteration:02d}'[2:])
+                article_id = int(f'{date.year}{date.month:02d}{date.day:02d}{iteration:02d}'[2:])
             else:
                 break
 
         article_data = {
             'id': article_id,
-            'date': f'{date.year}-{date.month}-{date.day}',
+            'date': f'{date.year}-{date.month:02d}-{date.day:02d}',
             'title': request.POST['title'],
             'description': request.POST['description'],
             'content': request.POST['content']
