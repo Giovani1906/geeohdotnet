@@ -1,5 +1,5 @@
 import os
-import json
+import orjson as json
 import hashlib
 import datetime
 
@@ -34,15 +34,15 @@ def get_context(**kwargs) -> dict:
     return context
 
 
-def get_articles() -> list:
+def get_articles() -> list[dict[str, str | int]]:
     try:
-        data = open('articles/index.json', 'rb').read()
-        return json.loads(data)['articles']
+        with open('articles/index.json', 'rb') as data:
+            return json.loads(data.read())['articles']
     except FileNotFoundError:
-        data = json.dumps({'articles': []}).encode('utf-8')
         if not os.path.exists('articles'):
             os.mkdir('articles')
-        open('articles/index.json', 'wb').write(data)
+        with open('articles/index.json', 'wb') as data:
+            data.write(json.dumps({'articles': []}))
         return []
 
 
@@ -63,8 +63,8 @@ def article(request: HttpRequest, article_id: int = None, article_title: str = N
     if article_title and article_title != slugify(article_data['title']):
         return redirect(f'/article/{article_id}/')
 
-    article_raw = open(f'articles/{article_id}.md', 'r', encoding='utf-8').read()
-    article_md = markdown(article_raw, extras=md_extra)
+    with open(f'articles/{article_id}.md', 'rb') as article_raw:
+        article_md = markdown(article_raw.read().decode('utf-8'), extras=md_extra)
     context = get_context(page='article', article=article_data, content=article_md)
 
     return render(request, 'article.html', context)
@@ -74,7 +74,7 @@ def article_redirect(request: HttpRequest, article_title: str):
     article_data = find(lambda a: slugify(a['title']) == article_title, get_articles())
     if not article_data:
         raise Http404
-    return redirect(f'/article/{article_data["id"]}/{article_title}/')
+    return redirect(f'/article/{article_data['id']}/{article_title}/')
 
 
 def auth(request: HttpRequest):
@@ -84,6 +84,7 @@ def auth(request: HttpRequest):
         if request.user.is_authenticated:
             logout(request)
             return redirect('/auth/')
+
         kwargs = {
             'request': request,
             'username': request.POST['username'],
@@ -116,7 +117,7 @@ def publish(request: HttpRequest):
     if request.method == 'GET':
         return render(request, 'publish.html', get_context(page='publish'))
     elif request.method == 'POST':
-        date = datetime.datetime.utcnow()
+        date = datetime.datetime.now(datetime.UTC)
         articles = get_articles()
         iteration = 1
         article_id = int(f'{date.year}{date.month:02d}{date.day:02d}{iteration:02d}'[2:])
@@ -140,12 +141,86 @@ def publish(request: HttpRequest):
         files.update(request.FILES)
         files = dict(files)
         os.makedirs(f'media/{article_id}')
-        open(f'media/{article_id}/thumbnail.png', 'wb').write(files['thumbnail'][0].read())
-        open(f'media/{article_id}/banner.png', 'wb').write(files['banner'][0].read())
+        with open(f'media/{article_id}/thumbnail.png', 'wb') as thumbnail:
+            thumbnail.write(files['thumbnail'][0].read())
+        with open(f'media/{article_id}/banner.png', 'wb') as banner:
+            banner.write(files['banner'][0].read())
         if 'article-files' in files:
             for file in files['article-files']:
-                open(f'media/{article_id}/{file.name}', 'wb').write(file.read())
-        open(f'articles/{article_id}.md', 'wb').write(article_data.pop('content').encode('utf-8'))
-        open(f'articles/index.json', 'wb').write(json.dumps({'articles': articles}).encode('utf-8'))
+                with open(f'media/{article_id}/{file.name}', 'wb') as art_file:
+                    art_file.write(file.read())
+        with open(f'articles/{article_id}.md', 'wb') as article_raw:
+            article_raw.write(article_data.pop('content').encode('utf-8'))
+        with open(f'articles/index.json', 'wb') as index_raw:
+            index_raw.write(json.dumps({'articles': articles}))
 
         return redirect(f'/article/{article_id}/')
+    else:
+        return render(request, '405.html', get_context(), status=405)
+
+
+@login_required
+def edit(request: HttpRequest, article_id: int = None):
+    if request.method == 'GET':
+        article_data = find(lambda a: a['id'] == article_id, get_articles())
+
+        if not article_data:
+            raise Http404
+
+        article_assets = os.listdir(f'media/{article_id}/')
+        article_assets.remove('banner.png')
+        article_assets.remove('thumbnail.png')
+
+        with open(f'articles/{article_id}.md', 'rb') as article_raw:
+            kwargs = {
+                'page': 'edit',
+                'article': article_data,
+                'content': article_raw.read().decode('utf-8'),
+                'assets': article_assets,
+            }
+
+        return render(request, 'edit.html', get_context(**kwargs))
+    elif request.method == 'POST':
+        articles = get_articles()
+        article_data = dict(find(lambda a: a['id'] == article_id, articles))
+
+        if not article_data:
+            raise Http404
+
+        article_index = articles.index(article_data)
+
+        for k, v in request.POST.items():
+            if k == 'title' and v != '':
+                article_data['title'] = v
+            elif k == 'description' and v != '':
+                article_data['description'] = v
+            elif v == 'to-be-deleted':
+                os.remove(f'media/{article_id}/{k}')
+
+        files = QueryDict(mutable=True)
+        files.update(request.FILES)
+        files = dict(files)
+
+        if 'thumbnail' in files:
+            with open(f'media/{article_id}/thumbnail.png', 'wb') as thumbnail:
+                thumbnail.write(files['thumbnail'][0].read())
+        if 'banner' in files:
+            with open(f'media/{article_id}/banner.png', 'wb') as banner:
+                banner.write(files['banner'][0].read())
+        if 'article-files' in files:
+            for file in files['article-files']:
+                with open(f'media/{article_id}/{file.name}', 'wb') as art_file:
+                    art_file.write(file.read())
+        with open(f'articles/{article_id}.md', 'rb') as article_raw:
+            if request.POST['content'] != '' or request.POST['content'] != article_raw.read().decode('utf-8'):
+                with open(f'articles/{article_id}.md', 'wb') as replace_raw:
+                    replace_raw.write(request.POST['content'].encode('utf-8'))
+
+        if article_data != articles[article_index]:
+            articles[article_index] = article_data
+            with open(f'articles/index.json', 'wb') as index_raw:
+                index_raw.write(json.dumps({'articles': articles}))
+
+        return redirect(f'/article/{article_id}/')
+    else:
+        return render(request, '405.html', get_context(), status=405)

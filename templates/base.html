@@ -33,7 +33,12 @@
             <div class="motto">I just don’t know what went wrong!</div>
         {% endif %}
         {% if user.is_authenticated and page != "publish" %}
-            <div class="publish"><a href="/publish/" style="color: #ffffff;">Publish</a></div>
+            <div class="publish">
+                <a href="/publish/" style="color: #ffffff;">Publish</a>
+                {% if page == "article" %}
+                    <a href="/article/{{ article.id }}/edit/" style="color: #ffffff;">Edit</a>
+                {% endif %}
+            </div>
         {% endif %}
     </div>
     {% block content %}{% endblock %}

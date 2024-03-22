@@ -10,6 +10,7 @@ from geeohdotnet import pages
 urlpatterns = [
     path('', pages.index),
     path('article/<int:article_id>/', pages.article),
+    path('article/<int:article_id>/edit/', pages.edit),
     path('article/<int:article_id>/<slug:article_title>/', pages.article),
     path('article/<slug:article_title>/', pages.article_redirect),
     path('auth/', pages.auth),

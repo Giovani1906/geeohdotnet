@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="content">
+        <div id="preview">Preview goes here.</div>
+        <form method="post" enctype="multipart/form-data">
+            <label for="content" style="display: block; padding: 21px 0 21px 0">Revise your thoughts, {{ user.username }}.</label>
+            <textarea name="content" id="content" rows="25">{{ content }}</textarea>
+            <label for="title">Post Title</label>
+            <input type="text" name="title" id="title" placeholder="{{ article.title }}" style="width: 100%; margin-bottom: 21px">
+            <label for="description">Post Description</label>
+            <input type="text" name="description" id="description" placeholder="{{ article.description }}" style="width: 100%; margin-bottom: 21px">
+            <div style="margin-bottom: 21px">
+                <div style="display: inline-block">
+                    <label for="thumbnail">New Thumbnail (Rec. Resolution: 240x135)</label>
+                    <input type="file" name="thumbnail" id="thumbnail">
+                </div>
+                <div style="float: right">
+                    <label for="banner">New Banner (Rec. Resolution: 1920x200)</label>
+                    <input type="file" name="banner" id="banner">
+                </div>
+            </div>
+            {% if assets %}
+                <fieldset style="margin-bottom: 21px">
+                    <legend>Which files should be deleted?</legend>
+                    {% for asset in assets %}
+                        <input type="checkbox" name="{{ asset }}" id="file{{ forloop.counter }}" value="to-be-deleted">
+                        <label for="file{{ forloop.counter }}">{{ asset }}</label>
+                    {% endfor %}
+                </fieldset>
+            {% endif %}
+            <label for="article-files">Article Files</label>
+            <input type="file" name="article-files" id="article-files" multiple style="margin-bottom: 21px">
+            <div>
+                <button id="publish-button" hx-post="/markdownify/" hx-swap="innerHTML" hx-target="#preview">Preview</button>
+                <input id="publish-button" type="submit" value="Update" onclick="return confirm('Are you sure?');" style="float: right">
+            </div>
+        </form>
+    </div>
+{% endblock %}

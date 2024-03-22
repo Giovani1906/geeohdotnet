@@ -1,4 +1,4 @@
-import json
+import orjson as json
 
 from geeohdotnet.pages import find
 from geeohdotnet.models import User
