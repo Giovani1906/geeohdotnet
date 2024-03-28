@@ -1,8 +1,8 @@
 .idea/
+.ruff_cache/
 __pycache__/
 geeohdotnet/__pycache__/
 venv/
-articles/
 media/
-credentials.json
+db.sqlite3
 settings.json
