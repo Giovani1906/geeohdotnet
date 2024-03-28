@@ -7,6 +7,6 @@
         <div class="description">{{ article.description }}</div>
     </div>
     <div class="content">
-        {{ content|safe }}
+        {{ article.content_formatted|safe }}
     </div>
 {% endblock %}
