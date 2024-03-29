@@ -1,21 +1,30 @@
-"""
-URL configuration for geeohdotnet project.
-"""
-from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib import admin
+from django.urls import path
 
-from geeohdotnet import pages
+from geeohdotnet import views
 
 urlpatterns = [
-    path('', pages.index),
-    path('article/<int:article_id>/', pages.article),
-    path('article/<int:article_id>/edit/', pages.edit),
-    path('article/<int:article_id>/<slug:article_title>/', pages.article),
-    path('article/<slug:article_title>/', pages.article_redirect),
-    path('auth/', pages.auth),
-    path('markdownify/', pages.markdownify),
-    path('publish/', pages.publish)
+    path("", views.ArticleListView.as_view(), name="index"),
+    path("auth/", views.auth, name="auth"),
+    path("admin/", admin.site.urls, name="admin"),
+    path("article/<int:pk>/", views.ArticleDetailView.as_view(), name="article-id"),
+    path(
+        "article/<int:pk>/edit/",
+        views.ArticleEditFormView.as_view(),
+        name="article-edit",
+    ),
+    path(
+        "article/<int:pk>/<slug:slug>/",
+        views.ArticleDetailView.as_view(),
+        name="article-id-slug",
+    ),
+    path(
+        "article/<slug:slug>/", views.ArticleDetailView.as_view(), name="article-slug"
+    ),
+    path("markdownify/", views.markdownify),
+    path("publish/", views.ArticlePublishFormView.as_view(), name="article-publish"),
 ]
 
 if settings.DEBUG:

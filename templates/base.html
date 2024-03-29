@@ -3,23 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="theme-color" content="#1b1b1b" />
-    {% if page == "article" %}
-        <meta property="og:site_name" content="geeoh.net">
-        <meta property="og:title" content="{{ article.title }}">
-        <meta property="og:description" content="{{ article.description }}">
-        <meta property="og:type" content="article">
-        <meta property="og:url" content="https://geeoh.net/article/{{ article.id }}/{{ article.title|slugify }}/">
-        <meta property="og:image" content="https://geeoh.net/media/{{ article.id }}/thumbnail.png">
-        <title>{{ article.title }} | geeoh.net</title>
-    {% elif page %}
-        <title>{{ page|title }} | geeoh.net</title>
-    {% else %}
-        <meta property="og:site_name" content="geeoh.net">
-        <meta property="og:type" content="website">
-        <meta property="og:description" content="Yelling at the void.">
-        <meta property="og:image" content="https://geeoh.net/static/favicon.png">
-        <title>geeoh.net</title>
-    {% endif %}
+    {% block metadata %}{% endblock %}
+    <title>{% block title %}{% endblock %}</title>
     <link rel="shortcut icon" href="/static/favicon.png">
     <link rel="stylesheet" type="text/css" href="/static/style.css{{ css_age }}">
     <script src="/static/js/htmx.min.js"></script>
@@ -27,15 +12,11 @@
 <body>
     <div class="header">
         <div class="title"><a href="/" style="color: #ffffff; text-decoration: none;">geeoh.net</a></div>
-        {% if motto %}
-            <div class="motto">{{ motto }}</div>
-        {% else %}
-            <div class="motto">I just don’t know what went wrong!</div>
-        {% endif %}
-        {% if user.is_authenticated and page != "publish" %}
+        <div class="motto">{{ motto }}</div>
+        {% if user.is_authenticated and page_type != "ArticlePublishFormView" %}
             <div class="publish">
                 <a href="/publish/" style="color: #ffffff;">Publish</a>
-                {% if page == "article" %}
+                {% if page_type == "ArticleDetailView" %}
                     <a href="/article/{{ article.id }}/edit/" style="color: #ffffff;">Edit</a>
                 {% endif %}
             </div>

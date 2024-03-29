@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block metadata %}
+    <meta property="og:site_name" content="geeoh.net">
+    <meta property="og:title" content="{{ article.title }}">
+    <meta property="og:description" content="{{ article.description }}">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://geeoh.net/article/{{ article.id }}/{{ article.title|slugify }}/">
+    <meta property="og:image" content="{{ article.thumb.url }}">
+{% endblock %}
+
+{% block title %}{{ article.title }} | geeoh.net{% endblock %}
+
+{% block content %}
+    <div class="content-header article">
+        <img src="{{ article.banner.url }}" alt="{{ article.title }}">
+        <div class="date" style="padding-top: 21px">{{ article.date|date:"Y-m-d"  }}</div>
+        <div class="title">{{ article.title }}</div>
+        <div class="description">{{ article.description }}</div>
+    </div>
+    <div class="content">
+        {{ article.content_formatted|safe }}
+    </div>
+{% endblock %}

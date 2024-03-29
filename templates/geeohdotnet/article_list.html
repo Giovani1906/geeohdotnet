@@ -1,14 +1,24 @@
 {% extends "base.html" %}
+
+{% block metadata %}
+    <meta property="og:site_name" content="geeoh.net">
+    <meta property="og:type" content="website">
+    <meta property="og:description" content="Yelling at the void.">
+    <meta property="og:image" content="https://geeoh.net/static/favicon.png">
+{% endblock %}
+
+{% block title %}geeoh.net{% endblock %}
+
 {% block content %}
-    {% if articles %}
+    {% if article_list %}
         <div class="articles">
-        {% for article in articles %}
+        {% for article in article_list reversed %}
             <div class="article">
                 <a href="/article/{{ article.id }}/{{ article.title|slugify }}/" style="text-decoration: none">
-                    <img class="thumbnail" src="/media/{{ article.id }}/thumbnail.png" alt="{{ article.title }}">
+                    <img class="thumbnail" src="{{ article.thumb.url }}" alt="{{ article.title }}">
                 </a>
                 <ul>
-                    <li class="date">{{ article.date }}</li>
+                    <li class="date">{{ article.date|date:"Y-m-d" }}</li>
                     <li class="title">
                         <a href="/article/{{ article.id }}/{{ article.title|slugify }}/">
                             {{ article.title }}
