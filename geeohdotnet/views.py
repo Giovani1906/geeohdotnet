@@ -2,22 +2,77 @@ import os
 from random import choice
 
 from django.conf import settings
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import get_object_or_404
+from django.http import HttpRequest, HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import DetailView, FormView, ListView
+from markdown2 import markdown
 
 from geeohdotnet import forms, models
 
 
+def get_context(**kwargs) -> dict:
+    mottos = models.Motto.objects.all()
+    context = {
+        "css_age": f'?v={os.path.getmtime("static/style.css"):.0f}',
+        "motto": choice(mottos) if mottos else "I just don't know what went wrong!",
+    }
+    context.update(**kwargs)
+    return context
+
+
+def auth(request: HttpRequest):
+    context = get_context()
+    if request.method == "GET":
+        return render(request, "geeohdotnet/auth.html", context)
+    elif request.method == "POST":
+        if request.user.is_authenticated:
+            logout(request)
+            return redirect("/auth/")
+
+        kwargs = {
+            "request": request,
+            "username": request.POST["username"],
+            "password": request.POST["password"],
+        }
+        user = authenticate(**kwargs)
+        if user is not None:
+            login(request, user)
+            if "next" in request.GET:
+                return redirect(request.GET["next"])
+            return redirect("/auth/")
+        else:
+            context["title"] = "Unauthorized"
+            context["message"] = "Bad username and/or password."
+            return render(request, "message.html", context, status=401)
+    else:
+        return render(request, "405.html", context, status=405)
+
+
+@login_required
+def markdownify(request: HttpRequest):
+    if request.method == "POST":
+        extras = [
+            "break-on-newline",
+            "code-friendly",
+            "fenced-code-blocks",
+            "footnotes",
+            "smarty-pants",
+            "spoiler",
+            "strike",
+            "tables",
+        ]
+        return HttpResponse(markdown(request.POST["content"], extras=extras))
+    else:
+        return render(request, "405.html", get_context(), status=405)
+
+
 class ExtraContext:
     def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["css_age"] = f'?v={os.path.getmtime("static/style.css"):.0f}'
+        context = get_context(**super().get_context_data(**kwargs))
         context["page_type"] = self.__class__.__name__
-        mottos = models.Motto.objects.all()
-        context["motto"] = (
-            choice(mottos) if mottos else "I just don't know what went wrong!"
-        )
 
         if isinstance(self, ArticleEditFormView):
             article = get_object_or_404(models.Article, pk=self.kwargs.get("pk", None))

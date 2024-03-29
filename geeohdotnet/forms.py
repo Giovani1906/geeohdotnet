@@ -1,5 +1,6 @@
 from django import forms
 from django.shortcuts import get_object_or_404
+
 from geeohdotnet.models import Article
 
 
@@ -45,7 +46,6 @@ class ArticleForm(forms.Form):
 
     def update_article(self, pk: int) -> Article:
         article = get_object_or_404(Article, pk=pk)
-        print(self.data)
 
         if self.cleaned_data["title"] != "":
             article.title = self.cleaned_data["title"]

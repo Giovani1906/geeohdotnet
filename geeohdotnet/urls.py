@@ -7,6 +7,7 @@ from geeohdotnet import views
 
 urlpatterns = [
     path("", views.ArticleListView.as_view(), name="index"),
+    path("auth/", views.auth, name="auth"),
     path("admin/", admin.site.urls, name="admin"),
     path("article/<int:pk>/", views.ArticleDetailView.as_view(), name="article-id"),
     path(
@@ -22,6 +23,7 @@ urlpatterns = [
     path(
         "article/<slug:slug>/", views.ArticleDetailView.as_view(), name="article-slug"
     ),
+    path("markdownify/", views.markdownify),
     path("publish/", views.ArticlePublishFormView.as_view(), name="article-publish"),
 ]
 
