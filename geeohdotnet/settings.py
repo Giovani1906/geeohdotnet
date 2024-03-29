@@ -1,14 +1,12 @@
-import json
 from pathlib import Path
+
+from geeohdotnet.secret import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-with open("settings.json", "rb") as f:
-    settings = json.loads(f.read())
+SECRET_KEY = config.SECRET_KEY
 
-SECRET_KEY = settings["secret_key"]
-
-DEBUG = settings["debug"]
+DEBUG = config.DEBUG
 
 ALLOWED_HOSTS = ["localhost", "geeoh.net"]
 
@@ -38,6 +36,8 @@ if not DEBUG:
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 
 ROOT_URLCONF = "geeohdotnet.urls"
+
+LOGIN_URL = "/auth"
 
 TEMPLATES = [
     {

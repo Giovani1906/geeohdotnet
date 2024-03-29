@@ -8,14 +8,21 @@ from geeohdotnet import views
 urlpatterns = [
     path("", views.ArticleListView.as_view(), name="index"),
     path("admin/", admin.site.urls, name="admin"),
-    path("article/<int:pk>/", views.ArticleView.as_view(), name="article-id"),
+    path("article/<int:pk>/", views.ArticleDetailView.as_view(), name="article-id"),
+    path(
+        "article/<int:pk>/edit/",
+        views.ArticleEditFormView.as_view(),
+        name="article-edit",
+    ),
     path(
         "article/<int:pk>/<slug:slug>/",
-        views.ArticleView.as_view(),
+        views.ArticleDetailView.as_view(),
         name="article-id-slug",
     ),
-    path("article/<slug:slug>/", views.ArticleView.as_view(), name="article-slug"),
-    path("publish/", views.ArticlePublishFormView.as_view(), name="publish"),
+    path(
+        "article/<slug:slug>/", views.ArticleDetailView.as_view(), name="article-slug"
+    ),
+    path("publish/", views.ArticlePublishFormView.as_view(), name="article-publish"),
 ]
 
 if settings.DEBUG:

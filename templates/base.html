@@ -13,10 +13,10 @@
     <div class="header">
         <div class="title"><a href="/" style="color: #ffffff; text-decoration: none;">geeoh.net</a></div>
         <div class="motto">{{ motto }}</div>
-        {% if user.is_authenticated and page != "publish" %}
+        {% if user.is_authenticated and page_type != "ArticlePublishFormView" %}
             <div class="publish">
                 <a href="/publish/" style="color: #ffffff;">Publish</a>
-                {% if page == "article" %}
+                {% if page_type == "ArticleDetailView" %}
                     <a href="/article/{{ article.id }}/edit/" style="color: #ffffff;">Edit</a>
                 {% endif %}
             </div>
