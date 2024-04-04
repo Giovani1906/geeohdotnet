@@ -8,7 +8,14 @@ SECRET_KEY = config.SECRET_KEY
 
 DEBUG = config.DEBUG
 
-ALLOWED_HOSTS = ["localhost", "geeoh.net"]
+ALLOWED_HOSTS = ["geeoh.net"]
+
+if DEBUG:
+    ALLOWED_HOSTS += ["localhost"]
+
+    STATICFILES_DIRS = [
+        BASE_DIR / "static",
+    ]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -31,7 +38,12 @@ MIDDLEWARE = [
 ]
 
 if not DEBUG:
+    SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+    STATIC_ROOT = BASE_DIR / "static"
 
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 
@@ -67,9 +79,6 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
 MEDIA_ROOT = BASE_DIR / "media"
 MEDIA_URL = "media/"
 DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600
