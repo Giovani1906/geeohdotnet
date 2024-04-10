@@ -5,8 +5,11 @@ from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.syndication.views import Feed
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.feedgenerator import Atom1Feed
+from django.utils.text import slugify
 from django.views.generic import DetailView, FormView, ListView
 from markdown2 import markdown
 
@@ -129,3 +132,39 @@ class ArticlePublishFormView(ExtraContext, LoginRequiredMixin, FormView):
 
 class ArticleEditFormView(ArticlePublishFormView):
     template_name = "geeohdotnet/article_edit.html"
+
+
+class Atom2Feed(Atom1Feed):
+    content_type = "text/xml"
+
+    def add_item_elements(self, handler, item):
+        super().add_item_elements(handler, item)
+        if "content" in item:
+            handler.addQuickElement("content", item["content"], {"type": "html"})
+
+
+class AtomFeed(Feed):
+    feed_type = Atom2Feed
+    title = "geeoh.net"
+    link = "/"
+    subtitle = "A place where I ramble about random stuff. Mostly tech related."
+    language = "en"
+
+    @staticmethod
+    def items():
+        return reversed(models.Article.objects.all())
+
+    def item_guid(self, item: models.Article) -> int:
+        return item.id
+
+    def item_title(self, item: models.Article) -> str:
+        return item.title
+
+    def item_description(self, item: models.Article) -> str:
+        return item.description
+
+    def item_link(self, item: models.Article) -> str:
+        return f"/article/{item.id}/{slugify(item.title)}/"
+
+    def item_extra_kwargs(self, item: models.Article) -> dict[str, str]:
+        return {"content": item.content_formatted}

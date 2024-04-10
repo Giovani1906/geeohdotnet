@@ -23,6 +23,7 @@ urlpatterns = [
     path(
         "article/<slug:slug>/", views.ArticleDetailView.as_view(), name="article-slug"
     ),
+    path("feed/", views.AtomFeed(), name="feed"),
     path("markdownify/", views.markdownify),
     path("publish/", views.ArticlePublishFormView.as_view(), name="article-publish"),
 ]
