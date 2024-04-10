@@ -1,4 +1,5 @@
 import os
+from hashlib import md5
 from random import choice
 
 from django.conf import settings
@@ -6,6 +7,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.syndication.views import Feed
+from django.db import connection
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.feedgenerator import Atom1Feed
@@ -16,10 +20,22 @@ from markdown2 import markdown
 from geeohdotnet import forms, models
 
 
+@receiver(post_save, sender=models.Article)
+def clear_web_cache(sender, **kwargs):
+    url = "https://geeoh.net" if not settings.DEBUG else "http://localhost:8080"
+    _hash = md5(f"{url}/feed/".encode("ascii"), usedforsecurity=False).hexdigest()
+    with connection.cursor() as cursor:
+        cursor.execute(
+            "DELETE FROM geeohdotnet_cache WHERE cache_key LIKE '%feed%'"
+            f"AND cache_key LIKE '%{_hash}%'"
+        )
+
+
 def get_context(**kwargs) -> dict:
-    mottos = models.Motto.objects.all()
+    motto_filter = models.Motto.objects.filter
+    mottos = motto_filter(priority=True) or motto_filter(priority=False, hidden=False)
     context = {
-        "css_age": f'?v={os.path.getmtime("static/style.css"):.0f}',
+        "css_age": f"?v={os.path.getmtime("static/style.css"):.0f}",
         "motto": choice(mottos) if mottos else "I just don't know what went wrong!",
     }
     context.update(**kwargs)
@@ -40,8 +56,7 @@ def auth(request: HttpRequest):
             "username": request.POST["username"],
             "password": request.POST["password"],
         }
-        user = authenticate(**kwargs)
-        if user is not None:
+        if (user := authenticate(**kwargs)) is not None:
             login(request, user)
             if "next" in request.GET:
                 return redirect(request.GET["next"])

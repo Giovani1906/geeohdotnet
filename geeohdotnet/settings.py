@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "axes",
     "geeohdotnet",
 ]
 
@@ -35,6 +36,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "axes.middleware.AxesMiddleware",
 ]
 
 if not DEBUG:
@@ -46,6 +48,32 @@ if not DEBUG:
     STATIC_ROOT = BASE_DIR / "static"
 
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
+
+AUTHENTICATION_BACKENDS = [
+    "axes.backends.AxesStandaloneBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
+AXES_ENABLED = True
+AXES_FAILURE_LIMIT = 3
+AXES_LOCK_OUT_AT_FAILURE = True
+AXES_COOLOFF_TIME = 24
+AXES_HANDLER = "axes.handlers.cache.AxesCacheHandler"
+AXES_LOCKOUT_TEMPLATE = "429.html"
+AXES_VERBOSE = DEBUG
+AXES_IPWARE_PROXY_COUNT = 1
+AXES_IPWARE_META_PRECEDENCE_ORDER = [
+    "HTTP_X_REAL_IP",
+    "HTTP_X_FORWARDED_FOR",
+    "REMOTE_ADDR",
+]
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "geeohdotnet_cache",
+    }
+}
 
 ROOT_URLCONF = "geeohdotnet.urls"
 

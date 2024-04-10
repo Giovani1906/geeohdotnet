@@ -7,5 +7,9 @@ class ArticleAdmin(admin.ModelAdmin):
     list_display = ["id", "title", "description"]
 
 
-admin.site.register(models.Motto)
+class MottoAdmin(admin.ModelAdmin):
+    list_display = ["motto", "priority", "hidden"]
+
+
 admin.site.register(models.Article, ArticleAdmin)
+admin.site.register(models.Motto, MottoAdmin)

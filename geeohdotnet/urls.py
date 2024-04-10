@@ -2,6 +2,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
+from django.views.decorators.cache import cache_page
 
 from geeohdotnet import views
 
@@ -23,7 +24,7 @@ urlpatterns = [
     path(
         "article/<slug:slug>/", views.ArticleDetailView.as_view(), name="article-slug"
     ),
-    path("feed/", views.AtomFeed(), name="feed"),
+    path("feed/", cache_page(None, key_prefix="feed")(views.AtomFeed()), name="feed"),
     path("markdownify/", views.markdownify),
     path("publish/", views.ArticlePublishFormView.as_view(), name="article-publish"),
 ]
