@@ -47,17 +47,17 @@ class ArticleForm(forms.Form):
     def update_article(self, pk: int) -> Article:
         article = get_object_or_404(Article, pk=pk)
 
-        if self.cleaned_data["title"] != "":
+        if self.cleaned_data["title"]:
             article.title = self.cleaned_data["title"]
-        if self.cleaned_data["description"] != "":
+        if self.cleaned_data["description"]:
             article.description = self.cleaned_data["description"]
         if self.cleaned_data["thumb"]:
             article.thumb = self.cleaned_data["thumb"]
         if self.cleaned_data["banner"]:
             article.banner = self.cleaned_data["banner"]
         if (
-            self.cleaned_data["content"] != ""
-            or self.cleaned_data["content"] != article.content
+            self.cleaned_data["content"]
+            and self.cleaned_data["content"] != article.content
         ):
             article.content = self.cleaned_data["content"]
 
